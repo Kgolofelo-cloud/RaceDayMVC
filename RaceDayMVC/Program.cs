@@ -8,12 +8,14 @@ builder.Services.AddControllersWithViews();
 
 // IMPORTANT: Update this port to match your running API's exact HTTPS port
 
+// 2. Configure HttpClient to consume the Part 2 RESTful API
 builder.Services.AddHttpClient("ApiClient", client =>
-
 {
-
     client.BaseAddress = new Uri("https://localhost:7081/api/v1/");
-
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    // Bypass local SSL certificate validation
+    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
 });
 
 // 3. Add Session Management for Role-Based Navigation
