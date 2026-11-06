@@ -1,60 +1,66 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RacedayMVC.Models;
-using System.Text.Json;
-using System.Text;
-
-namespace RacedayMVC.Controllers
-{
-public class ParticipantController : Controller
-{
-private readonly HttpClient _httpClient;
-
-public ParticipantController(IHttpClientFactory httpClientFactory)
-{
-_httpClient = httpClientFactory.CreateClient("ApiClient");
+﻿@model IEnumerable<RacedayMVC.Models.EventWithCategoriesViewModel>
+@{
+    ViewData["Title"] = "Upcoming Races";
 }
 
-// GET: /Participant/Index (Dashboard)
-public async Task<IActionResult>
-Index()
+<h2 class="mb-4">Upcoming Races</h2>
+
+@if (TempData["Success"] != null)
 {
-if (HttpContext.Session.GetString("UserRole") != "Participant")
-return RedirectToAction("Login", "Auth");
-
-var response = await _httpClient.GetAsync("events");
-var events = new List<EventWithCategoriesViewModel>
-();
-if (response.IsSuccessStatusCode)
+    <div class="alert alert-success fw-bold shadow-sm">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
 {
-events = await response.Content.ReadFromJsonAsync<List<EventWithCategoriesViewModel>>() ?? new List<EventWithCategoriesViewModel>();
-}
-return View(events);
+    <div class="alert alert-danger fw-bold shadow-sm">@TempData["Error"]</div>
 }
 
-// POST: /Participant/Enrol
-[HttpPost]
-public async Task<IActionResult> Enrol(int categoryId)
-{
-if (HttpContext.Session.GetString("UserRole") != "Participant")
-return RedirectToAction("Login", "Auth");
-
-// We must send the CategoryID to the API's enrolment endpoint
-var payload = new { CategoryID = categoryId };
-var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-var response = await _httpClient.PostAsync("registrations", content);
-
-if (response.IsSuccessStatusCode)
-{
-TempData["Success"] = "Successfully enrolled in the race!";
-}
-else
-{
-var error = await response.Content.ReadAsStringAsync();
-TempData["Error"] = $"Enrolment failed: {error}";
-}
-
-return RedirectToAction("Index");
-}
-}
-}
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                @if (!string.IsNullOrEmpty(item.BannerUrl))
+                {
+                    <img src="@item.BannerUrl" class="card-img-top" alt="Event Banner" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span>No Banner Available</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title text-primary fw-bold">@item.EventName</h5>
+                    <p class="card-text text-muted mb-2">
+                        <small>📅 @item.EventDate.ToString("dd MMM yyyy")</small><br />
+                        <small>📍 @item.Location</small>
+                    </p>
+                    <hr />
+                    <h6 class="fw-bold">Available Races:</h6>
+                    @if (item.Categories != null && item.Categories.Any())
+                    {
+                        <ul class="list-group list-group-flush mb-3">
+                            @foreach (var cat in item.Categories)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <strong>@cat.CategoryName</strong> (@cat.Distance km)<br />
+                                        <span class="text-success fw-bold">R @cat.EntryFee</span>
+                                    </div>
+                                    <form asp-action="Enrol" method="post">
+                                        <input type="hidden" name="categoryId" value="@cat.CategoryID" />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Enrol</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-danger small"><em>Categories not yet released by organiser.</em></p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

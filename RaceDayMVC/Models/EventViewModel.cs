@@ -48,5 +48,15 @@ namespace RacedayMVC.Models
         public List<CategoryViewModel> Categories { get; set; } = new List<CategoryViewModel>();
     }
 
+    public class CreateCategoryViewModel
+    {
+        public int EventID { get; set; }
+        [Required(ErrorMessage = "Category name is required")]
+        public string CategoryName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Distance is required")]
+        public decimal Distance { get; set; }
+        [Required(ErrorMessage = "Entry fee is required")]
+        public decimal EntryFee { get; set; }
+    }
 
 }
