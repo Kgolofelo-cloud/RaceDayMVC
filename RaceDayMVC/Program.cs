@@ -4,18 +4,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-// 2. Configure HttpClient to consume the Part 2 RESTful API
-
-// IMPORTANT: Update this port to match your running API's exact HTTPS port
-
-// 2. Configure HttpClient to consume the Part 2 RESTful API
+// 2. Configure HttpClient with a Cookie Container to remember API sessions
+var cookieContainer = new System.Net.CookieContainer();
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7081/api/v1/");
+    client.BaseAddress = new Uri("https://localhost:7081/api/v1/"); // Keep your correct port here
 }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {
-    // Bypass local SSL certificate validation
-    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true,
+    CookieContainer = cookieContainer,
+    UseCookies = true
 });
 
 // 3. Add Session Management for Role-Based Navigation

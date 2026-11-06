@@ -1,5 +1,78 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model RacedayMVC.Models.CreateEventViewModel
+
 @{
+
+    ViewData["Title"] = "Create Event";
+
 }
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Publish New Race Event</h4>
+            </div>
+            <div class="card-body p-4">
+
+                @if (ViewBag.Error != null)
+
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+
+                }
+
+                <form asp-action="CreateEvent" method="post" enctype="multipart/form-data">
+                    <!-- This line will print out exactly why the form is failing -->
+                    <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="EventName" class="form-label fw-bold">Event Name</label>
+                        <input asp-for="EventName" class="form-control" placeholder="e.g., Soweto Marathon" />
+                        <span asp-validation-for="EventName" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="EventDate" class="form-label fw-bold">Event Date</label>
+                            <input asp-for="EventDate" type="date" class="form-control" />
+                            <span asp-validation-for="EventDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LocationID" class="form-label fw-bold">Location</label>
+                            <select asp-for="LocationID" class="form-select">
+                                <option value="">-- Select a Location --</option>
+
+                                @if (ViewBag.Locations != null)
+
+                                {
+
+                                    foreach (var loc in ViewBag.Locations)
+
+                                    {
+                                        <option value="@loc.LocationID">@loc.DisplayName</option>
+
+                                    }
+
+                                }
+                            </select>
+                            <span asp-validation-for="LocationID" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="BannerImage" class="form-label fw-bold text-primary">Upload Event Banner (Azure Storage)</label>
+                        <input asp-for="BannerImage" type="file" class="form-control" accept="image/*" />
+                        <div class="form-text">Upload a high-quality image to attract participants.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Events" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold">Create Event & Upload Image</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
