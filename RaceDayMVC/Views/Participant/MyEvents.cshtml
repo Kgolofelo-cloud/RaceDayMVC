@@ -1,0 +1,41 @@
+﻿@model IEnumerable<RacedayMVC.Models.MyEnrolmentViewModel>
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<h2 class="mb-4">My Enrolments</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info shadow-sm">
+        You haven't enrolled in any races yet! Head over to the <a asp-action="Index" class="fw-bold">Upcoming Races</a> page to find an event.
+    </div>
+}
+else
+{
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Race Category</th>
+                    <th>Distance</th>
+                    <th>Enrolment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold text-primary">@item.EventName</td>
+                        <td>@item.EventDate.ToString("dd MMM yyyy")</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.Distance km</td>
+                        <td>@item.RegistrationDate.ToString("dd MMM yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
