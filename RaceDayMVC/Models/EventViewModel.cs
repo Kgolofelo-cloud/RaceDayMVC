@@ -59,4 +59,42 @@ namespace RacedayMVC.Models
         public decimal EntryFee { get; set; }
     }
 
+    public class EventParticipantViewModel
+    {
+        public int RegistrationID { get; set; }
+        public string ParticipantName { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
+        public DateTime RegistrationDate { get; set; }
+        public bool HasResult { get; set; }
+        public string? FinishTime { get; set; }
+        public int? Position { get; set; }
+    }
+
+    public class DashboardSummaryViewModel
+
+    {
+
+        public int TotalEvents { get; set; }
+
+        public int TotalEnrolments { get; set; }
+
+        public int UpcomingEventsCount { get; set; }
+
+        public List<EventSummaryViewModel> RecentEvents { get; set; } = new List<EventSummaryViewModel>();
+
+    }
+
+    public class EventSummaryViewModel
+
+    {
+
+        public string EventName { get; set; } = string.Empty;
+
+        public DateTime EventDate { get; set; }
+
+        public int EnrolmentCount { get; set; }
+
+    }
+
+
 }

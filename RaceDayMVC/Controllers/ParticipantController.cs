@@ -90,6 +90,40 @@ namespace RacedayMVC.Controllers
 
         }
 
+        // GET: /Participant/MyEvents
+        [HttpGet]
+        public async Task<IActionResult> MyEvents()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Participant")
+                return RedirectToAction("Login", "Auth");
+
+            // Assuming your API endpoint is GET: api/v1/registrations
+            var response = await _httpClient.GetAsync("registrations");
+            var enrolments = new List<MyEnrolmentViewModel>();
+            if (response.IsSuccessStatusCode)
+            {
+                enrolments = await response.Content.ReadFromJsonAsync<List<MyEnrolmentViewModel>>() ?? new List<MyEnrolmentViewModel>();
+            }
+            return View(enrolments);
+        }
+
+        // GET: /Participant/Results
+        [HttpGet]
+        public async Task<IActionResult> Results()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Participant")
+                return RedirectToAction("Login", "Auth");
+
+            // Assuming your API endpoint is GET: api/v1/results
+            var response = await _httpClient.GetAsync("results");
+            var results = new List<MyResultViewModel>();
+            if (response.IsSuccessStatusCode)
+            {
+                results = await response.Content.ReadFromJsonAsync<List<MyResultViewModel>>() ?? new List<MyResultViewModel>();
+            }
+            return View(results);
+        }
+
     }
 
 }

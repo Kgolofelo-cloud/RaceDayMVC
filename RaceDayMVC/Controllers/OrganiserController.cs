@@ -15,12 +15,20 @@ namespace RacedayMVC.Controllers
             _httpClient = httpClientFactory.CreateClient("ApiClient");
         }
 
-        public IActionResult Index()
+        // GET: /Organiser/Index
+        public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("UserRole") != "Organiser")
                 return RedirectToAction("Login", "Auth");
 
-            return View();
+            var response = await _httpClient.GetAsync("events/dashboard");
+            var dashboardData = new DashboardSummaryViewModel();
+            if (response.IsSuccessStatusCode)
+            {
+                dashboardData = await response.Content.ReadFromJsonAsync<DashboardSummaryViewModel>() ?? new DashboardSummaryViewModel();
+            }
+
+            return View(dashboardData);
         }
 
         // GET: /Organiser/Events
@@ -108,5 +116,84 @@ namespace RacedayMVC.Controllers
             await LoadLocationsIntoViewBag();
             return View(model);
         }
+
+        // GET: /Organiser/AddCategory
+        [HttpGet]
+        public IActionResult AddCategory(int eventId)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+                return RedirectToAction("Login", "Auth");
+
+            // Pass the EventID into the form so the API knows which event to attach it to
+            var model = new CreateCategoryViewModel { EventID = eventId };
+            return View(model);
+        }
+
+        // POST: /Organiser/AddCategory
+        [HttpPost]
+        public async Task<IActionResult> AddCategory(CreateCategoryViewModel model)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+                return RedirectToAction("Login", "Auth");
+
+            if (!ModelState.IsValid) return View(model);
+
+            var payload = new { model.CategoryName, model.Distance, model.EntryFee };
+            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+            // Send to the API's specific category endpoint
+            var response = await _httpClient.PostAsync($"events/{model.EventID}/categories", content);
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Success"] = "Race category added successfully!";
+                return RedirectToAction("Events");
+            }
+
+            var errorResponse = await response.Content.ReadAsStringAsync();
+            ViewBag.Error = $"API Error ({response.StatusCode}): {errorResponse}";
+            return View(model);
+        }
+
+        // GET: /Organiser/ViewEnrolments
+        [HttpGet]
+        public async Task<IActionResult> ViewEnrolments(int eventId, string eventName)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+                return RedirectToAction("Login", "Auth");
+
+            ViewBag.EventName = eventName;
+            ViewBag.EventID = eventId;
+
+            var response = await _httpClient.GetAsync($"registrations/event/{eventId}");
+            var participants = new List<EventParticipantViewModel>();
+
+            if (response.IsSuccessStatusCode)
+            {
+                participants = await response.Content.ReadFromJsonAsync<List<EventParticipantViewModel>>() ?? new List<EventParticipantViewModel>();
+            }
+
+            return View(participants);
+        }
+
+        // POST: /Organiser/PublishResult
+        [HttpPost]
+        public async Task<IActionResult> PublishResult(int eventId, string eventName, int registrationId, string finishTime, int position)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+                return RedirectToAction("Login", "Auth");
+
+            var payload = new { RegistrationID = registrationId, FinishTime = finishTime, OverallPosition = position };
+            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("results", content);
+
+            if (response.IsSuccessStatusCode)
+                TempData["Success"] = "Result published successfully!";
+            else
+                TempData["Error"] = "Failed to publish result. Format must be HH:MM:SS.";
+
+            return RedirectToAction("ViewEnrolments", new { eventId = eventId, eventName = eventName });
+        }
+
     }
 }

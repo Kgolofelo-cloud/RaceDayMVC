@@ -10,14 +10,14 @@
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success fw-bold shadow-sm">@TempData["Success"]</div>
 }
 
 <div class="row">
     @foreach (var item in Model)
     {
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm h-100 border-0">
                 @if (!string.IsNullOrEmpty(item.BannerUrl))
                 {
                     <img src="@item.BannerUrl" class="card-img-top" alt="Event Banner" style="height: 200px; object-fit: cover;">
@@ -28,12 +28,21 @@
                         <span>No Banner Uploaded</span>
                     </div>
                 }
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title text-primary fw-bold">@item.EventName</h5>
-                    <p class="card-text">
-                        <strong>Date:</strong> @item.EventDate.ToString("dd MMM yyyy")<br />
-                        <strong>Location:</strong> @item.Location
+                    <p class="card-text text-muted mb-4">
+                        <small><strong>Date:</strong> @item.EventDate.ToString("dd MMM yyyy")</small><br />
+                        <small><strong>Location:</strong> @item.Location</small>
                     </p>
+                    <!-- The mt-auto pushes these buttons to the bottom of the card, and gap-2 spaces them nicely -->
+                    <div class="mt-auto d-flex flex-column gap-2">
+                        <a asp-action="AddCategory" asp-route-eventId="@item.EventID" class="btn btn-outline-success w-100 fw-bold">
+                            + Add Race Category
+                        </a>
+                        <a asp-action="ViewEnrolments" asp-route-eventId="@item.EventID" asp-route-eventName="@item.EventName" class="btn btn-outline-info w-100 fw-bold">
+                            View Enrolments & Results
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

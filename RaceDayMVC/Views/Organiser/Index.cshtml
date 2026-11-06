@@ -1,7 +1,104 @@
-﻿@{
+﻿@model RacedayMVC.Models.DashboardSummaryViewModel
+@{
     ViewData["Title"] = "Organiser Dashboard";
 }
-<h2 class="mb-4">Organiser Dashboard</h2>
-<div class="alert alert-info shadow-sm">
-    Welcome to your Organiser control panel! From here, you will manage events and capture race results.
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Organiser Dashboard</h2>
+</div>
+
+<!-- Key Metrics Cards -->
+<div class="row mb-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 border-start border-5 border-primary h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Events Managed</div>
+                        <div class="h5 mb-0 fw-bold text-dark">@Model.TotalEvents</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fs-2 text-muted">🏆</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 border-start border-5 border-success h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs fw-bold text-success text-uppercase mb-1">Upcoming Events</div>
+                        <div class="h5 mb-0 fw-bold text-dark">@Model.UpcomingEventsCount</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fs-2 text-muted">📅</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 border-start border-5 border-info h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs fw-bold text-info text-uppercase mb-1">Total Enrolments</div>
+                        <div class="h5 mb-0 fw-bold text-dark">@Model.TotalEnrolments</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fs-2 text-muted">🏃</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Summary Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h6 class="m-0 fw-bold text-primary">Recent Event Activity</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Event Name</th>
+                        <th>Date</th>
+                        <th>Enrolments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.RecentEvents.Any())
+                    {
+                        <tr><td colspan="3" class="text-center text-muted py-4">No events found. Start by creating one!</td></tr>
+                    }
+                    @foreach (var evt in Model.RecentEvents)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold">@evt.EventName</td>
+                            <td>
+                                @if (evt.EventDate >= DateTime.Now)
+                                {
+                                    <span class="badge bg-success">Upcoming</span> <span>@evt.EventDate.ToString("dd MMM yyyy")</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Past</span> <span>@evt.EventDate.ToString("dd MMM yyyy")</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-info rounded-pill px-3 fs-6">@evt.EnrolmentCount</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
