@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="dotnet-ci.yml" />
+  </Folder>
   <Project Path="RaceDayMVC/RaceDayMVC.csproj" />
 </Solution>
