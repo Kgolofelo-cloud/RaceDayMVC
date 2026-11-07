@@ -124,6 +124,52 @@ namespace RacedayMVC.Controllers
             return View(results);
         }
 
+        // GET: /Participant/Profile
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Participant")
+                return RedirectToAction("Login", "Auth");
+
+            var response = await _httpClient.GetAsync("profile");
+            var profile = new UserProfileViewModel();
+            if (response.IsSuccessStatusCode)
+            {
+                profile = await response.Content.ReadFromJsonAsync<UserProfileViewModel>() ?? new UserProfileViewModel();
+            }
+
+            return View(profile);
+        }
+
+        // POST: /Participant/UploadPicture
+        [HttpPost]
+        public async Task<IActionResult> UploadPicture(UserProfileViewModel model)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Participant")
+                return RedirectToAction("Login", "Auth");
+
+            if (model.ProfileImage != null && model.ProfileImage.Length > 0)
+            {
+                using var form = new MultipartFormDataContent();
+                using var stream = model.ProfileImage.OpenReadStream();
+                var streamContent = new StreamContent(stream);
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(model.ProfileImage.ContentType);
+                form.Add(streamContent, "file", model.ProfileImage.FileName);
+
+                var response = await _httpClient.PostAsync("profile/picture", form);
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["Success"] = "Profile picture updated successfully!";
+                }
+                else
+                {
+                    TempData["Error"] = "Failed to upload image to Azure.";
+                }
+            }
+            return RedirectToAction("Profile");
+        }
+
+
     }
 
 }
