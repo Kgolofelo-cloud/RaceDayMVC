@@ -24,7 +24,7 @@
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? ProfilePictureUrl { get; set; }
-        // Used to catch the uploaded file from the HTML form
+        
         public IFormFile? ProfileImage { get; set; }
     }
 
