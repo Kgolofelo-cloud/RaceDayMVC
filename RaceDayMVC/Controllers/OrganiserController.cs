@@ -124,7 +124,7 @@ namespace RacedayMVC.Controllers
             if (HttpContext.Session.GetString("UserRole") != "Organiser")
                 return RedirectToAction("Login", "Auth");
 
-            // Pass the EventID into the form so the API knows which event to attach it to
+            
             var model = new CreateCategoryViewModel { EventID = eventId };
             return View(model);
         }
@@ -154,7 +154,7 @@ namespace RacedayMVC.Controllers
             return View(model);
         }
 
-        // GET: /Organiser/ViewEnrolments
+        
         [HttpGet]
         public async Task<IActionResult> ViewEnrolments(int eventId, string eventName)
         {
@@ -175,7 +175,7 @@ namespace RacedayMVC.Controllers
             return View(participants);
         }
 
-        // POST: /Organiser/PublishResult
+        
         [HttpPost]
         public async Task<IActionResult> PublishResult(int eventId, string eventName, int registrationId, string finishTime, int position)
         {
